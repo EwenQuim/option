@@ -1,4 +1,4 @@
-package optional
+package option
 
 import (
 	"encoding/json"
@@ -6,17 +6,17 @@ import (
 )
 
 // Some builds an Option when value is present.
-func Some[T comparable](value T) Option[T] {
+func Some[T any](value T) Option[T] {
 	return Option[T]{value: &value}
 }
 
 // None builds an Option when value is absent.
-func None[T comparable]() Option[T] {
+func None[T any]() Option[T] {
 	return Option[T]{value: nil}
 }
 
 // TupleToOption converts a tuple to an Option.
-func TupleToOption[T comparable](value T, ok bool) Option[T] {
+func TupleToOption[T any](value T, ok bool) Option[T] {
 	if ok {
 		return Some(value)
 	}
@@ -69,6 +69,14 @@ func (option Option[T]) ValueOrDefault(fallback T) T {
 		return res
 	}
 	return fallback
+}
+
+// Update updates the value of the Option.
+func (option *Option[T]) Update(value T) {
+	if option.IsPresent() {
+		*option.value = value
+	}
+	*option = Some(value)
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

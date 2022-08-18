@@ -1,4 +1,4 @@
-package optional
+package option
 
 import (
 	"encoding/json"
@@ -30,6 +30,22 @@ func TestString(t *testing.T) {
 
 	require.Equal(t, "Some(foo)", option.String())
 	require.Equal(t, "None", option2.String())
+}
+
+func TestUpdate(t *testing.T) {
+	t.Run("Update with value", func(t *testing.T) {
+		option := Some(1)
+		option.Update(2)
+		require.Equal(t, 2, option.MustValue())
+	})
+
+	t.Run("Update without value", func(t *testing.T) {
+		option2 := None[string]()
+		option2.Update("foo")
+		value, ok := option2.Value()
+		require.True(t, ok)
+		require.Equal(t, "foo", value)
+	})
 }
 
 func TestGet(t *testing.T) {
