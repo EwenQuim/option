@@ -2,6 +2,7 @@ package option
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -48,6 +49,20 @@ func TestUpdate(t *testing.T) {
 	})
 }
 
+func TestApply(t *testing.T) {
+	t.Run("Apply with value", func(t *testing.T) {
+		option := Some("FoO")
+		option.Apply(strings.ToLower)
+		require.Equal(t, "foo", option.MustValue())
+	})
+
+	t.Run("Apply without value", func(t *testing.T) {
+		option := None[string]()
+		option.Apply(strings.ToLower)
+		require.Equal(t, None[string](), option)
+	})
+}
+
 func TestGet(t *testing.T) {
 	option := Some(1)
 	option2 := None[string]()
@@ -78,8 +93,8 @@ func TestGetDefault(t *testing.T) {
 }
 
 type TestStruct struct {
-	OptionalValueInt    Option[int]    `json:"optional_value_int"`
-	OptionalValueString Option[string] `json:"optional_value_string,omitempty"`
+	OptionalValueInt    Option[int]    `json:"optionalValueInt"`
+	OptionalValueString Option[string] `json:"optionalValueString,omitempty"`
 }
 
 func TestMarshalOption(t *testing.T) {
@@ -99,7 +114,7 @@ func TestMarshalOption(t *testing.T) {
 
 		data, err := json.Marshal(testStruct)
 		require.NoError(t, err)
-		require.Equal(t, `{"optional_value_int":1,"optional_value_string":"foo"}`, string(data))
+		require.Equal(t, `{"optionalValueInt":1,"optionalValueString":"foo"}`, string(data))
 	})
 
 	t.Run("Marshal without value", func(t *testing.T) {
@@ -117,7 +132,7 @@ func TestMarshalOption(t *testing.T) {
 
 		data, err := json.Marshal(testStruct)
 		require.NoError(t, err)
-		require.Equal(t, `{"optional_value_int":null,"optional_value_string":"foo"}`, string(data))
+		require.Equal(t, `{"optionalValueInt":null,"optionalValueString":"foo"}`, string(data))
 	})
 }
 
@@ -138,7 +153,7 @@ func TestUnmarshalOption(t *testing.T) {
 
 	t.Run("Unmarshal struct with value", func(t *testing.T) {
 		var testStruct TestStruct
-		err := json.Unmarshal([]byte(`{"optional_value_int":1,"optional_value_string":"foo"}`), &testStruct)
+		err := json.Unmarshal([]byte(`{"optionalValueInt":1,"optionalValueString":"foo"}`), &testStruct)
 		require.NoError(t, err)
 		require.Equal(t, TestStruct{
 			OptionalValueInt:    Some(1),
@@ -148,7 +163,7 @@ func TestUnmarshalOption(t *testing.T) {
 
 	t.Run("Unmarshal struct without int value", func(t *testing.T) {
 		var testStruct TestStruct
-		err := json.Unmarshal([]byte(`{"optional_value_int":null,"optional_value_string":"foo"}`), &testStruct)
+		err := json.Unmarshal([]byte(`{"optionalValueInt":null,"optionalValueString":"foo"}`), &testStruct)
 		require.NoError(t, err)
 		require.Equal(t, TestStruct{
 			OptionalValueInt:    None[int](),
@@ -158,7 +173,7 @@ func TestUnmarshalOption(t *testing.T) {
 
 	t.Run("Unmarshal struct without struct value", func(t *testing.T) {
 		var testStruct TestStruct
-		err := json.Unmarshal([]byte(`{"optional_value_int":1,"optional_value_string":null}`), &testStruct)
+		err := json.Unmarshal([]byte(`{"optionalValueInt":1,"optionalValueString":null}`), &testStruct)
 		require.NoError(t, err)
 		require.Equal(t, TestStruct{
 			OptionalValueInt:    Some(1),
@@ -168,7 +183,7 @@ func TestUnmarshalOption(t *testing.T) {
 
 	t.Run("Unmarshal struct with value and empty optional", func(t *testing.T) {
 		var testStruct TestStruct
-		err := json.Unmarshal([]byte(`{"optional_value_int":1}`), &testStruct)
+		err := json.Unmarshal([]byte(`{"optionalValueInt":1}`), &testStruct)
 		require.NoError(t, err)
 		require.Equal(t, TestStruct{
 			OptionalValueInt:    Some(1),

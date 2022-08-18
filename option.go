@@ -20,6 +20,7 @@ func TupleToOption[T any](value T, ok bool) Option[T] {
 	if ok {
 		return Some(value)
 	}
+
 	return None[T]()
 }
 
@@ -68,6 +69,7 @@ func (option Option[T]) ValueOrDefault(fallback T) T {
 	if ok {
 		return res
 	}
+
 	return fallback
 }
 
@@ -76,13 +78,22 @@ func (option *Option[T]) Update(value T) {
 	if option.IsPresent() {
 		*option.value = value
 	}
+
 	*option = Some(value)
+}
+
+// Apply applies the given function to the value of the Option.
+func (option *Option[T]) Apply(f func(T) T) {
+	if option.IsPresent() {
+		*option.value = f(*option.value)
+	}
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (option *Option[T]) UnmarshalJSON(data []byte) error {
 	if string(data) == "null" {
 		option.value = nil
+
 		return nil
 	}
 
@@ -92,6 +103,7 @@ func (option *Option[T]) UnmarshalJSON(data []byte) error {
 	}
 
 	option.value = &value
+
 	return nil
 }
 
