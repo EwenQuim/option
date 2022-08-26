@@ -49,8 +49,8 @@ func (option Option[T]) IsAbsent() bool {
 	return option.value == nil
 }
 
-// Value returns value and presence. If value is absent, returns zero value and false.
-func (option Option[T]) Value() (T, bool) {
+// GetValue returns value and presence. If value is absent, returns zero value and false.
+func (option Option[T]) GetValue() (T, bool) {
 	if option.IsPresent() {
 		return *option.value, true
 	}
@@ -65,7 +65,7 @@ func (option Option[T]) MustValue() T {
 
 // ValueOrDefault returns value if present or the default value given instead.
 func (option Option[T]) ValueOrDefault(fallback T) T {
-	res, ok := option.Value()
+	res, ok := option.GetValue()
 	if ok {
 		return res
 	}

@@ -43,7 +43,7 @@ func TestUpdate(t *testing.T) {
 	t.Run("Update without value", func(t *testing.T) {
 		option2 := None[string]()
 		option2.Update("foo")
-		value, ok := option2.Value()
+		value, ok := option2.GetValue()
 		require.True(t, ok)
 		require.Equal(t, "foo", value)
 	})
@@ -67,11 +67,11 @@ func TestGet(t *testing.T) {
 	option := Some(1)
 	option2 := None[string]()
 
-	got, ok := option.Value()
+	got, ok := option.GetValue()
 	require.Equal(t, 1, got)
 	require.True(t, ok)
 
-	got2, ok := option2.Value()
+	got2, ok := option2.GetValue()
 	require.Equal(t, "", got2)
 	require.False(t, ok)
 }
